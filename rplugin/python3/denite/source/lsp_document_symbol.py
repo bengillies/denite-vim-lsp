@@ -51,7 +51,7 @@ OUTLINE_HIGHLIGHT_SYNTAX = [
 class Source(Base):
     def __init__(self, vim):
         super().__init__(vim)
-        self.name = 'lsp_docment_symbol'
+        self.name = 'lsp_document_symbol'
         self.kind = 'file'
 
         self.vim.vars['denite#source#vim_lsp#_results'] = []
