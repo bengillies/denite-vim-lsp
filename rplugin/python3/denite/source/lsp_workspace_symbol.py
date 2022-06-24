@@ -42,6 +42,11 @@ LSP_SYMBOL_KINDS = [
     'TypeParameter',
 ]
 
+OUTLINE_HIGHLIGHT_SYNTAX = [
+    {'name': 'File', 'link': 'Type', 're': r'^[^\[]+'},
+    {'name': 'Type', 'link': 'Statement', 're': r'\[.\{-}\]'},
+    {'name': 'Pattern', 'link': 'Comment', 're': r'[^\]]+$'}
+]
 
 class Source(Base):
     def __init__(self, vim):
@@ -65,6 +70,18 @@ class Source(Base):
         self.vim.call('denite_vim_lsp#workspace_symbol')
         return []
 
+    def highlight(self):
+        for syn in OUTLINE_HIGHLIGHT_SYNTAX:
+            self.vim.command(
+                'syntax match {0}_{1} /{2}/ contained containedin={0}'.format(
+                    self.syntax_name, syn['name'], syn['re']
+                )
+            )
+            self.vim.command(
+                'highlight default link {0}_{1} {2}'.format(
+                    self.syntax_name, syn['name'], syn['link']
+                )
+            )
 
 def make_candidates(symbols):
     if not symbols:
@@ -80,17 +97,21 @@ def make_candidates(symbols):
 def _parse_candidate(symbol):
     candidate = {}
     loc = symbol['location']
-    p = urlparse(loc['uri'])
-    fp = os.path.abspath(os.path.join(p.netloc, p.path))
+    url_path = urlparse(loc['uri'])
+    relative_path = os.path.relpath(os.path.join(url_path.netloc, url_path.path))
+    line = loc['range']['start']['line'] + 1
+    col = loc['range']['start']['character'] + 1
 
-    candidate['word'] = symbol['name']
-    candidate['abbr'] = '{} [{}] {}'.format(
-        symbol['name'],
-        LSP_SYMBOL_KINDS[symbol['kind'] - 1],
-        fp,
-    )
+    location_display = './{}:{}:{}'.format(relative_path, line, col)
 
-    candidate['action__path'] = fp
-    candidate['action__line'] = loc['range']['start']['line'] + 1
-    candidate['action__col'] = loc['range']['start']['character'] + 1
+    symbol_type_display = LSP_SYMBOL_KINDS[symbol['kind'] - 1]
+
+    candidate['word'] = '{} {}'.format(symbol['name'], symbol_type_display)
+
+    candidate['abbr'] = '{} {}'.format(candidate['word'], location_display)
+
+    candidate['action__path'] = location_display
+    candidate['action__line'] = line
+    candidate['action__col'] = col
+
     return candidate
