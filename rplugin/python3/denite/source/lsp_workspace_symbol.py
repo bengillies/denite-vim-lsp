@@ -43,7 +43,7 @@ LSP_SYMBOL_KINDS = [
 ]
 
 OUTLINE_HIGHLIGHT_SYNTAX = [
-    {'name': 'File', 'link': 'Type', 're': r'^[^\[]+'},
+    {'name': 'File', 'link': 'Type', 're': r'^.\{-}\W'},
     {'name': 'Type', 'link': 'Statement', 're': r'\[.\{-}\]'},
     {'name': 'Pattern', 'link': 'Comment', 're': r'[^\]]+$'}
 ]
@@ -104,7 +104,7 @@ def _parse_candidate(symbol):
 
     location_display = './{}:{}:{}'.format(relative_path, line, col)
 
-    symbol_type_display = LSP_SYMBOL_KINDS[symbol['kind'] - 1]
+    symbol_type_display = '[{}]'.format(LSP_SYMBOL_KINDS[symbol['kind'] - 1])
 
     candidate['word'] = '{} {}'.format(symbol['name'], symbol_type_display)
 

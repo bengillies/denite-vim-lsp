@@ -43,7 +43,7 @@ LSP_SYMBOL_KINDS = [
 ]
 
 OUTLINE_HIGHLIGHT_SYNTAX = [
-    {'name': 'File', 'link': 'Type', 're': r'^[^\[]+'},
+    {'name': 'File', 'link': 'Type', 're': r'^.\{-}\W'},
     {'name': 'Type', 'link': 'Statement', 're': r'\[.\{-}\]'},
     {'name': 'Pattern', 'link': 'Comment', 're': r'[^\]]+$'}
 ]
@@ -62,7 +62,7 @@ class Source(Base):
             if self.vim.vars['denite#source#vim_lsp#_request_completed']:
                 context['is_async'] = False
                 return make_candidates(
-                    self.vim.vars['denite#source#vim_lsp#_results'], self.vim)
+                    self.vim.vars['denite#source#vim_lsp#_results'])
             return []
 
         self.vim.vars['denite#source#vim_lsp#_request_completed'] = False
@@ -84,18 +84,18 @@ class Source(Base):
             )
 
 
-def make_candidates(symbols, vim):
+def make_candidates(symbols):
     if not symbols:
         logger.info('symbol nothing')
         return []
     if not isinstance(symbols, list):
         logger.info('symbol is not list')
         return []
-    candidates = [_parse_candidate(symbol, vim) for symbol in symbols]
+    candidates = [_parse_candidate(symbol) for symbol in symbols]
     return candidates
 
 
-def _parse_candidate(symbol, vim):
+def _parse_candidate(symbol):
     candidate = {}
     loc = symbol['location']
     url_path = urlparse(loc['uri'])
@@ -105,7 +105,7 @@ def _parse_candidate(symbol, vim):
 
     location_display = './{}:{}:{}'.format(relative_path, line, col)
 
-    symbol_type_display = LSP_SYMBOL_KINDS[symbol['kind'] - 1]
+    symbol_type_display = '[{}]'.format(LSP_SYMBOL_KINDS[symbol['kind'] - 1])
 
     candidate['word'] = '{} {}'.format(symbol['name'], symbol_type_display)
 
