@@ -110,7 +110,7 @@ def _parse_candidate(symbol):
 
     candidate['abbr'] = '{} {}'.format(candidate['word'], location_display)
 
-    candidate['action__path'] = location_display
+    candidate['action__path'] = relative_path
     candidate['action__line'] = line
     candidate['action__col'] = col
 
