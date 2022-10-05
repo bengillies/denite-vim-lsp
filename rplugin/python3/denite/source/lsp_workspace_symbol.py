@@ -5,12 +5,12 @@ from urllib.parse import urlparse
 from .base import Base
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.CRITICAL)
 
 handler = logging.FileHandler('denitevimlsp.log')
 fmt = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
 handler.setFormatter(fmt)
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.CRITICAL)
 logger.addHandler(handler)
 
 LSP_SYMBOL_KINDS = [
